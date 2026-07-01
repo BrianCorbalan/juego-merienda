@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡Vuelta al Año! · Juego de Equipo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- HEADER -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-dice">🎲</span>
+        <span class="brand-text">Vuelta al Año</span>
+      </div>
+      <div class="turn-chip" id="turnChip">
+        <span id="turnChipEmoji">🐯</span>
+        <span id="turnChipName">Brian</span>
+      </div>
+      <button id="endGameBtn" class="btn btn-ghost">Finalizar partida</button>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <main class="layout">
+
+      <!-- BOARD -->
+      <section class="board-wrap">
+        <div id="board" class="board"></div>
+
+        <div class="dice-dock">
+          <div id="diceCube" class="dice-cube">
+            <div class="dice-face">?</div>
+          </div>
+          <button id="rollBtn" class="btn btn-primary btn-roll">🎲 Tirar dado</button>
+        </div>
+      </section>
+
+      <!-- SIDE PANEL -->
+      <aside class="side-panel" id="sidePanel">
+        <h2 class="panel-title">Jugadores</h2>
+        <div id="playerList" class="player-list"></div>
+      </aside>
+
+    </main>
+  </div>
+
+  <!-- OVERLAY LAYER -->
+  <div id="overlayLayer" class="overlay-layer"></div>
+
+  <!-- ================= TEMPLATES ================= -->
+
+  <template id="tpl-turn-popup">
+    <div class="overlay-backdrop fade">
+      <div class="turn-popup pop">
+        <div class="turn-popup-dice">🎲</div>
+        <div class="turn-popup-label">Turno de</div>
+        <div class="turn-popup-name" data-role="name"></div>
+        <div class="turn-popup-emoji" data-role="emoji"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-main-card">
+    <div class="overlay-backdrop fade">
+      <div class="question-card pop" data-role="card">
+        <div class="qc-icon" data-role="icon"></div>
+        <div class="qc-category" data-role="category"></div>
+        <div class="qc-stars" data-role="stars"></div>
+        <div class="qc-question" data-role="question"></div>
+        <div class="qc-actions">
+          <button class="btn btn-primary" data-action="confirm">✅ Respondió — Dar estrella</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-bonus-card">
+    <div class="overlay-backdrop fade">
+      <div class="question-card bonus pop" data-role="card">
+        <div class="qc-icon">🎁</div>
+        <div class="qc-category">BONUS · Cultura General</div>
+        <div class="qc-question" data-role="question"></div>
+        <div class="qc-actions two">
+          <button class="btn btn-correct" data-action="correct">✅ Correcto</button>
+          <button class="btn btn-incorrect" data-action="incorrect">❌ Incorrecto</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-lap-choice">
+    <div class="overlay-backdrop fade">
+      <div class="lap-card pop">
+        <div class="lap-title">🏁 ¡Vuelta completa!</div>
+        <div class="lap-subtitle">Elegí una categoría para ganar una estrella</div>
+        <div class="lap-options" data-role="options"></div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-star-burst">
+    <div class="overlay-backdrop fade transparent">
+      <div class="star-burst pop">
+        <div class="star-burst-emoji">⭐</div>
+        <div class="star-burst-text">¡Estrella conseguida!</div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-category-complete">
+    <div class="overlay-backdrop fade transparent">
+      <div class="cat-complete pop">
+        <div class="cat-complete-emoji" data-role="icon"></div>
+        <div class="cat-complete-text">¡Categoría completa!</div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-final">
+    <div class="overlay-backdrop fade solid">
+      <div class="final-screen">
+        <div class="final-title" data-role="title">🎉 ¡Partida terminada! 🎉</div>
+        <div class="final-sub">Revelando monedas…</div>
+        <div class="ranking-list" data-role="ranking"></div>
+        <button class="btn btn-primary" data-action="close">Cerrar</button>
+      </div>
+    </div>
+  </template>
+
+  <script src="js/data-categories.js"></script>
+  <script src="js/data-players.js"></script>
+  <script src="js/data-questions.js"></script>
+  <script src="js/data-bonus.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/dice.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
