@@ -1,12 +1,19 @@
 /**
  * main.js
  * -------
- * Punto de entrada. Conecta los botones de la interfaz y arranca la
- * partida apenas carga la página.
+ * Punto de entrada. Usa delegación de eventos para los clicks, porque el
+ * botón de tirar dado ahora se genera dinámicamente dentro del centro del
+ * tablero (y se regenera cada vez que arranca una partida nueva).
  */
 
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#rollBtn')) {
+    handleRollClick();
+  } else if (e.target.closest('#endGameBtn')) {
+    handleEndGameClick();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('rollBtn').addEventListener('click', handleRollClick);
-  document.getElementById('endGameBtn').addEventListener('click', handleEndGameClick);
   startGame();
 });

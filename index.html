@@ -29,13 +29,6 @@
       <!-- BOARD -->
       <section class="board-wrap">
         <div id="board" class="board"></div>
-
-        <div class="dice-dock">
-          <div id="diceCube" class="dice-cube">
-            <div class="dice-face">?</div>
-          </div>
-          <button id="rollBtn" class="btn btn-primary btn-roll">🎲 Tirar dado</button>
-        </div>
       </section>
 
       <!-- SIDE PANEL -->
@@ -59,6 +52,7 @@
         <div class="turn-popup-label">Turno de</div>
         <div class="turn-popup-name" data-role="name"></div>
         <div class="turn-popup-emoji" data-role="emoji"></div>
+        <div class="turn-popup-tap">Tocá para comenzar</div>
       </div>
     </div>
   </template>
@@ -91,12 +85,31 @@
     </div>
   </template>
 
-  <template id="tpl-lap-choice">
+  <template id="tpl-five-popup">
+    <div class="overlay-backdrop fade">
+      <div class="five-popup pop">
+        <div class="five-popup-dice">🎲</div>
+        <div class="five-popup-title">¡Salió 5!</div>
+        <div class="five-popup-sub">Volvés a tirar</div>
+        <div class="five-popup-total" data-role="total"></div>
+        <button class="btn btn-primary" data-action="reroll">🎲 Tirar de nuevo</button>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-special-popup">
     <div class="overlay-backdrop fade">
       <div class="lap-card pop">
-        <div class="lap-title">🏁 ¡Vuelta completa!</div>
-        <div class="lap-subtitle">Elegí una categoría para ganar una estrella</div>
-        <div class="lap-options" data-role="options"></div>
+        <div class="lap-title">
+          <span data-role="icon"></span>
+          <span data-role="title"></span>
+        </div>
+        <div class="lap-subtitle">Elegí una opción</div>
+
+        <div class="special-section-label">⭐ Reclamar una estrella</div>
+        <div class="lap-options" data-role="star-options"></div>
+
+        <button class="btn btn-primary special-reroll-btn" data-action="reroll">🎲 Volver a tirar</button>
       </div>
     </div>
   </template>

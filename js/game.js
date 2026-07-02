@@ -1,9 +1,17 @@
 /**
  * game.js
  * -------
- * Orquesta el flujo de un turno: popup de turno -> tirar dado -> mover
- * ficha casilla por casilla -> resolver vuelta(s) completada(s) ->
- * resolver casilla final -> siguiente turno / fin de partida.
+ * Orquesta el flujo de un turno:
+ *  1) popup de turno (permanece abierto hasta que el usuario toca)
+ *  2) tirar dado (con cadena de re-tiro si sale 5)
+ *  3) mover ficha casilla por casilla, mostrando el contador digital
+ *     grande en el centro del tablero, y detectando cada vez que la
+ *     ficha PASA POR o CAE EN la casilla de Salida/Llegada
+ *  4) al terminar el movimiento, resolver la casilla final:
+ *       - Especial   -> popup "Reclamar estrella / Volver a tirar"
+ *       - Salida     -> ya se resolvió durante el movimiento
+ *       - categoría  -> pregunta principal o bonus (cards.js)
+ *  5) siguiente turno / fin de partida
  */
 
 function wait(ms) {
@@ -21,10 +29,11 @@ async function beginTurn() {
 
   const player = getCurrentPlayer();
   updateTurnChip(player);
+  resetDiceDisplay();
 
   GameState.isBusy = true;
   setRollButtonEnabled(false);
-  await showTurnPopup(player);
+  await showTurnPopup(player); // se mantiene abierto hasta que el usuario toca "Tocá para comenzar"
   GameState.isBusy = false;
   setRollButtonEnabled(true, '🎲 Tirar dado');
 }
@@ -35,6 +44,17 @@ async function handleRollClick() {
   setRollButtonEnabled(false);
 
   const player = getCurrentPlayer();
+  await performPlayerMove(player);
+  await endTurn(player);
+}
+
+/**
+ * Ejecuta un tiro completo (con su cadena de "sacaste 5, tirá de nuevo")
+ * y el movimiento resultante. Si en el camino el jugador elige "Volver a
+ * tirar" (desde Especial o Salida), esta función se llama a sí misma de
+ * forma recursiva para el mismo jugador, como si fuera un tiro extra.
+ */
+async function performPlayerMove(player) {
   let totalSteps = 0;
   let keepRolling = true;
 
@@ -44,41 +64,82 @@ async function handleRollClick() {
     totalSteps += value;
 
     if (value === 5) {
-      setRollButtonEnabled(false, '🎲 ¡Sacaste 5! Tira de nuevo…');
-      await wait(650);
+      // No sigue solo: espera a que el usuario confirme el tiro extra.
+      await showFiveBonusPopup(totalSteps);
     } else {
       keepRolling = false;
     }
   }
 
-  setRollButtonEnabled(false, '🎲 Tirar dado');
-  await movePlayerSteps(player, totalSteps);
-  await resolveArrival(player);
-  await endTurn(player);
+  // Se muestra el puntaje logrado y se deja un momento para poder verlo
+  // bien antes de que la ficha arranque a moverse.
+  showDigitalCounter(totalSteps);
+  await wait(1100);
+
+  const moveResult = await movePlayerStepsWithChecks(player, totalSteps);
+
+  if (moveResult.rerolled) {
+    await performPlayerMove(player);
+    return;
+  }
+
+  hideDigitalCounter();
+
+  const cell = getBoardCell(player.position);
+
+  if (cell.categoryId === 'especial') {
+    const choice = await showSpecialChoicePopup(player, 'especial');
+    if (choice === 'reroll') {
+      await performPlayerMove(player);
+      return;
+    }
+    // 'claimed' o sin categorías pendientes: no hay nada más que hacer.
+  } else if (cell.categoryId === 'salida') {
+    // Ya se resolvió durante el recorrido (ver movePlayerStepsWithChecks),
+    // incluso si la ficha terminó exactamente ahí.
+  } else {
+    await resolveLandingCell(player, cell.categoryId);
+  }
 }
 
-async function movePlayerSteps(player, steps) {
-  for (let s = 0; s < steps; s++) {
+/**
+ * Mueve la ficha una casilla a la vez, actualizando el contador digital
+ * grande. Cada vez que la ficha pisa o atraviesa la casilla de Salida
+ * (índice 0), se detiene el recorrido, se otorgan las monedas de vuelta
+ * y se muestra el popup de elección. Si el jugador elige "volver a
+ * tirar", el resto del movimiento actual se descarta.
+ */
+async function movePlayerStepsWithChecks(player, steps) {
+  let remaining = steps;
+
+  while (remaining > 0) {
     player.position = (player.position + 1) % TOTAL_CELLS;
     player.totalStepsWalked += 1;
+    remaining -= 1;
+
     renderTokens();
     bumpTokenAtCell(player.id);
     await wait(300);
+    updateDigitalCounter(remaining);
+
+    if (player.position === SALIDA_INDEX) {
+      player.lapsCompleted += 1;
+      player.coins += coinsForLap(player.lapsCompleted); // monedas ocultas
+
+      hideDigitalCounter();
+      const choice = await showSpecialChoicePopup(player, 'salida');
+
+      if (choice === 'reroll') {
+        return { rerolled: true };
+      }
+
+      if (remaining > 0) {
+        showDigitalCounter(remaining);
+      }
+    }
   }
-}
 
-async function resolveArrival(player) {
-  const newLaps = Math.floor(player.totalStepsWalked / TOTAL_CELLS);
-  const lapsGained = newLaps - player.lapsCompleted;
-
-  for (let i = 1; i <= lapsGained; i++) {
-    const lapNumber = player.lapsCompleted + i;
-    await runLapCompletionFlow(player, lapNumber);
-  }
-  player.lapsCompleted = newLaps;
-
-  const cell = getBoardCell(player.position);
-  await resolveLandingCell(player, cell.categoryId);
+  return { rerolled: false };
 }
 
 async function endTurn(player) {

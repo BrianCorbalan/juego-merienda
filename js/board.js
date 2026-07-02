@@ -13,17 +13,17 @@
 
 const BOARD_SIZE = 8; // grilla de referencia 8x8 -> perímetro = 28 casillas
 const TOTAL_CELLS = 28;
+const SALIDA_INDEX = 0; // la casilla de Salida/Llegada vive siempre en el índice 0
 
-// Orden fijo de categorías, 4 grupos de 7 (uno por lado del tablero).
+// Secuencia FIJA de categorías, exactamente como especificada:
+// índice 0 = Salida/Llegada, luego 3 lados de 7 casillas y 1 lado de 6,
+// cerrando el circuito de vuelta en Salida (índice 0).
 const BOARD_CATEGORY_SEQUENCE = [
-  // Lado 1 (arriba)
-  'equipo', 'trabajo', 'especial', 'random', 'anecdotas', 'futuro', 'aprendizajes',
-  // Lado 2 (derecha)
-  'futuro', 'anecdotas', 'trabajo', 'especial', 'aprendizajes', 'equipo', 'random',
-  // Lado 3 (abajo)
-  'aprendizajes', 'random', 'futuro', 'equipo', 'especial', 'trabajo', 'anecdotas',
-  // Lado 4 (izquierda)
-  'random', 'especial', 'anecdotas', 'aprendizajes', 'trabajo', 'futuro', 'equipo'
+  'salida',                                                                          // 0
+  'trabajo', 'equipo', 'especial', 'anecdotas', 'futuro', 'aprendizajes', 'random',   // 1-7
+  'anecdotas', 'equipo', 'especial', 'trabajo', 'aprendizajes', 'futuro', 'random',   // 8-14
+  'equipo', 'trabajo', 'especial', 'aprendizajes', 'futuro', 'anecdotas', 'random',   // 15-21
+  'trabajo', 'futuro', 'especial', 'anecdotas', 'equipo', 'aprendizajes'              // 22-27
 ];
 
 /**

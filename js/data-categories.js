@@ -12,61 +12,69 @@ const CATEGORIES = {
     id: 'trabajo',
     name: 'Trabajo',
     icon: '💼',
-    color: '#FF6B4A',
-    colorSoft: 'rgba(255,107,74,0.16)',
+    color: '#A9673A', // Marrón
+    colorSoft: 'rgba(169,103,58,0.18)',
     isStarCategory: true
   },
   equipo: {
     id: 'equipo',
     name: 'Equipo',
     icon: '🤝',
-    color: '#2FD3C6',
-    colorSoft: 'rgba(47,211,198,0.16)',
+    color: '#3DDC84', // Verde
+    colorSoft: 'rgba(61,220,132,0.18)',
     isStarCategory: true
   },
   aprendizajes: {
     id: 'aprendizajes',
     name: 'Aprendizajes',
     icon: '📚',
-    color: '#9B6BFF',
-    colorSoft: 'rgba(155,107,255,0.16)',
+    color: '#3B82F6', // Azul
+    colorSoft: 'rgba(59,130,246,0.18)',
     isStarCategory: true
   },
   anecdotas: {
     id: 'anecdotas',
     name: 'Anécdotas',
     icon: '😂',
-    color: '#FFD23F',
-    colorSoft: 'rgba(255,210,63,0.16)',
+    color: '#FF7A29', // Naranja
+    colorSoft: 'rgba(255,122,41,0.18)',
     isStarCategory: true
   },
   futuro: {
     id: 'futuro',
     name: 'Futuro',
     icon: '🚀',
-    color: '#FF5FA2',
-    colorSoft: 'rgba(255,95,162,0.16)',
+    color: '#8B5CF6', // Violeta
+    colorSoft: 'rgba(139,92,246,0.18)',
     isStarCategory: true
   },
   random: {
     id: 'random',
     name: 'Random',
     icon: '🎲',
-    color: '#4ADE80',
-    colorSoft: 'rgba(74,222,128,0.16)',
+    color: '#FF4D4D', // Rojo
+    colorSoft: 'rgba(255,77,77,0.18)',
     isStarCategory: true
   },
   especial: {
     id: 'especial',
     name: 'Especial',
     icon: '⭐',
-    color: '#FFD700',
-    colorSoft: 'rgba(255,215,0,0.18)',
-    isStarCategory: false // casilla comodín: siempre entrega BONUS
+    color: '#FFD700', // Amarillo
+    colorSoft: 'rgba(255,215,0,0.2)',
+    isStarCategory: false // Nunca entrega estrella propia: abre popup de elección
+  },
+  salida: {
+    id: 'salida',
+    name: 'Salida / Llegada',
+    icon: '🏁',
+    color: '#F5E9D9', // Blanco cálido / crema
+    colorSoft: 'rgba(245,233,217,0.22)',
+    isStarCategory: false // Igual que Especial, pero también se activa al pasar de largo
   }
 };
 
-// Categorías que otorgan estrellas (excluye "especial")
+// Categorías que otorgan estrellas (excluye "especial" y "salida")
 const STAR_CATEGORY_IDS = Object.values(CATEGORIES)
   .filter(c => c.isStarCategory)
   .map(c => c.id);

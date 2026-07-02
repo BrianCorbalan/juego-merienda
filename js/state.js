@@ -29,9 +29,9 @@ function createPlayerState(rosterEntry) {
     name: rosterEntry.name,
     emoji: rosterEntry.emoji,
     tokenColor: rosterEntry.tokenColor,
-    position: 0,          // índice de casilla 0..27
-    totalStepsWalked: 0,   // usado para detectar vueltas completas
-    lapsCompleted: 0,
+    position: 0,          // índice de casilla 0..27 (arranca en Salida)
+    totalStepsWalked: 0,   // pasos totales caminados (informativo)
+    lapsCompleted: 0,       // se incrementa cada vez que cruza/pisa Salida
     stars,                 // { trabajo: 0-3, equipo: 0-3, ... }
     nextMainIndex,         // próxima pregunta principal pendiente por categoría
     coins: 0,

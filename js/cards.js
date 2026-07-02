@@ -1,26 +1,23 @@
 /**
  * cards.js
  * --------
- * Decide QUÉ pasa cuando una ficha cae en una casilla o completa una
- * vuelta, y aplica los cambios de estado correspondientes (estrellas,
- * monedas). Usa los popups de ui.js para mostrarlo.
+ * Decide QUÉ pasa cuando una ficha cae en una casilla de categoría normal
+ * (con estrellas), y aplica los cambios de estado correspondientes
+ * (estrellas, monedas). Usa los popups de ui.js para mostrarlo.
+ *
+ * Las casillas ⭐ Especial y 🏁 Salida/Llegada NO pasan por acá: tienen su
+ * propio popup de elección (ver showSpecialChoicePopup en ui.js y su
+ * orquestación en game.js), porque nunca entregan bonus ni preguntan
+ * directamente — dejan elegir entre reclamar una estrella o volver a tirar.
  */
 
 /**
- * Resuelve la casilla donde terminó de caer un jugador.
- *  - Categoría "especial"            -> siempre BONUS
+ * Resuelve la casilla donde terminó de caer un jugador, para categorías
+ * normales (con estrellas):
  *  - Categoría con estrellas pendientes -> pregunta principal
- *  - Categoría ya completada (3/3)   -> BONUS
+ *  - Categoría ya completada (3/3)      -> BONUS
  */
 async function resolveLandingCell(player, categoryId) {
-  const cat = getCategory(categoryId);
-
-  if (!cat.isStarCategory) {
-    // Casilla ⭐ Especial: siempre bonus
-    await runBonusFlow(player);
-    return;
-  }
-
   if (!categoryIsComplete(player, categoryId)) {
     await runMainQuestionFlow(player, categoryId);
   } else {
@@ -29,28 +26,7 @@ async function resolveLandingCell(player, categoryId) {
 }
 
 async function runMainQuestionFlow(player, categoryId) {
-  const qIndex = player.nextMainIndex[categoryId];
-  const questionText = getMainQuestion(categoryId, qIndex);
-  if (questionText == null) {
-    // Salvaguarda: no debería pasar si la categoría no está completa.
-    await runBonusFlow(player);
-    return;
-  }
-
-  const starsAfter = player.stars[categoryId] + 1;
-  await showMainQuestionCard(categoryId, questionText, starsAfter);
-
-  // Aplicar recompensa
-  player.stars[categoryId] = starsAfter;
-  player.nextMainIndex[categoryId] = qIndex + 1;
-  player.coins += coinsForMainQuestion();
-
-  updateSidePanelStars();
-  await showStarBurst();
-
-  if (categoryIsComplete(player, categoryId)) {
-    await showCategoryComplete(categoryId);
-  }
+  await claimStarViaPopup(player, categoryId);
 }
 
 async function runBonusFlow(player) {
@@ -62,32 +38,25 @@ async function runBonusFlow(player) {
 }
 
 /**
- * Se ejecuta al completar una vuelta. Si al jugador le faltan estrellas,
- * muestra la ventana "Elegí una categoría", responde automáticamente la
- * siguiente pregunta pendiente de esa categoría y otorga la estrella.
+ * Responde automáticamente la siguiente pregunta pendiente de la
+ * categoría elegida y otorga la estrella correspondiente. Reutilizado
+ * tanto por categorías normales como por el popup de Especial/Salida.
  */
-async function runLapCompletionFlow(player, lapNumber) {
-  const lapCoins = coinsForLap(lapNumber);
-  player.coins += lapCoins;
+async function claimStarViaPopup(player, categoryId) {
+  const qIndex = player.nextMainIndex[categoryId];
+  const questionText = getMainQuestion(categoryId, qIndex);
+  const starsAfter = player.stars[categoryId] + 1;
 
-  const pending = pendingCategoriesFor(player);
-  if (pending.length === 0) return;
+  await showMainQuestionCard(categoryId, questionText, starsAfter);
 
-  const chosenCategoryId = await showLapChoiceCard(pending);
-  const qIndex = player.nextMainIndex[chosenCategoryId];
-  const questionText = getMainQuestion(chosenCategoryId, qIndex);
-  const starsAfter = player.stars[chosenCategoryId] + 1;
-
-  await showMainQuestionCard(chosenCategoryId, questionText, starsAfter);
-
-  player.stars[chosenCategoryId] = starsAfter;
-  player.nextMainIndex[chosenCategoryId] = qIndex + 1;
+  player.stars[categoryId] = starsAfter;
+  player.nextMainIndex[categoryId] = qIndex + 1;
   player.coins += coinsForMainQuestion();
 
   updateSidePanelStars();
   await showStarBurst();
 
-  if (categoryIsComplete(player, chosenCategoryId)) {
-    await showCategoryComplete(chosenCategoryId);
+  if (categoryIsComplete(player, categoryId)) {
+    await showCategoryComplete(categoryId);
   }
 }

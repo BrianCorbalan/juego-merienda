@@ -13,7 +13,9 @@ const UI = {
   turnChipEmojiEl: null,
   turnChipNameEl: null,
   rollBtn: null,
-  diceCube: null
+  diceCube: null,
+  diceAssembly: null,
+  digitalCounterEl: null
 };
 
 function initUI() {
@@ -22,11 +24,17 @@ function initUI() {
   UI.overlayLayerEl = document.getElementById('overlayLayer');
   UI.turnChipEmojiEl = document.getElementById('turnChipEmoji');
   UI.turnChipNameEl = document.getElementById('turnChipName');
-  UI.rollBtn = document.getElementById('rollBtn');
-  UI.diceCube = document.getElementById('diceCube');
 
   renderBoardCells();
   renderSidePanel();
+
+  // El dado y el contador digital viven DENTRO del centro del tablero,
+  // así que sus referencias solo existen luego de renderBoardCells().
+  UI.rollBtn = document.getElementById('rollBtn');
+  UI.diceCube = document.getElementById('diceCube');
+  UI.diceAssembly = document.getElementById('diceAssembly');
+  UI.digitalCounterEl = document.getElementById('digitalCounter');
+
   updateTurnChip(getCurrentPlayer());
   renderTokens();
 }
@@ -38,12 +46,18 @@ function renderBoardCells() {
   UI.boardEl.style.gridTemplateColumns = `repeat(${BOARD_SIZE}, 1fr)`;
   UI.boardEl.style.gridTemplateRows = `repeat(${BOARD_SIZE}, 1fr)`;
 
-  // Centro decorativo del tablero
+  // Centro del tablero: acá vive siempre el dado (nunca se mueve de ahí).
   const center = document.createElement('div');
   center.className = 'board-center';
   center.style.gridRow = `2 / ${BOARD_SIZE}`;
   center.style.gridColumn = `2 / ${BOARD_SIZE}`;
-  center.innerHTML = `<div class="board-center-logo">🎲<span>Vuelta al<br>Año</span></div>`;
+  center.innerHTML = `
+    <div class="dice-assembly" id="diceAssembly">
+      <div id="diceCube" class="dice-cube"><div class="dice-face">?</div></div>
+      <button id="rollBtn" class="btn btn-primary btn-roll">🎲 Tirar dado</button>
+    </div>
+    <div id="digitalCounter" class="digital-counter"></div>
+  `;
   UI.boardEl.appendChild(center);
 
   BOARD_CELLS.forEach(cell => {
@@ -176,17 +190,19 @@ function hideOverlayEl(el) {
   });
 }
 
-/** Popup grande de turno: aparece, espera ~1s, desaparece solo. */
+/** Popup grande de turno: aparece y permanece abierto hasta que el
+ * usuario lo toca. Recién ahí se habilita el dado. */
 function showTurnPopup(player) {
   return new Promise(resolve => {
     const el = cloneTemplate('tpl-turn-popup');
     el.querySelector('[data-role="name"]').textContent = player.name;
     el.querySelector('[data-role="emoji"]').textContent = player.emoji;
-    showOverlayEl(el);
-    setTimeout(async () => {
+    const card = el.querySelector('.turn-popup');
+    card.addEventListener('click', async () => {
       await hideOverlayEl(el);
       resolve();
-    }, 1000);
+    }, { once: true });
+    showOverlayEl(el);
   });
 }
 
@@ -231,23 +247,71 @@ function showBonusCard(questionText) {
   });
 }
 
-/** Ventana "Elegí una categoría" al completar una vuelta. Resuelve con el id elegido. */
-function showLapChoiceCard(availableCategoryIds) {
+/**
+ * Popup que aparece cada vez que el dado saca un 5: informa el tiro extra
+ * y muestra cuántos pasos lleva acumulados el jugador en esta tirada.
+ * Permanece abierto hasta que el usuario toca "Tirar de nuevo".
+ */
+function showFiveBonusPopup(totalStepsSoFar) {
   return new Promise(resolve => {
-    const el = cloneTemplate('tpl-lap-choice');
-    const optionsWrap = el.querySelector('[data-role="options"]');
-    availableCategoryIds.forEach(catId => {
-      const cat = getCategory(catId);
-      const btn = document.createElement('button');
-      btn.className = 'lap-option';
-      btn.style.setProperty('--opt-color', cat.color);
-      btn.innerHTML = `<span class="lap-option-icon">${cat.icon}</span><span>${cat.name}</span>`;
-      btn.addEventListener('click', async () => {
-        await hideOverlayEl(el);
-        resolve(catId);
-      }, { once: true });
-      optionsWrap.appendChild(btn);
-    });
+    const el = cloneTemplate('tpl-five-popup');
+    el.querySelector('[data-role="total"]').textContent =
+      `Llevás ${totalStepsSoFar} ${totalStepsSoFar === 1 ? 'paso acumulado' : 'pasos acumulados'}`;
+
+    el.querySelector('[data-action="reroll"]').addEventListener('click', async () => {
+      await hideOverlayEl(el);
+      resolve();
+    }, { once: true });
+
+    showOverlayEl(el);
+  });
+}
+
+/**
+ * Popup de las casillas ⭐ Especial y 🏁 Salida/Llegada. Permanece abierto
+ * hasta que el usuario elige una opción:
+ *  - Reclamar una estrella: solo se listan categorías con estrellas
+ *    pendientes; al elegir una, responde automáticamente su siguiente
+ *    pregunta y otorga la estrella (resuelve con 'claimed').
+ *  - Volver a tirar: descarta lo que quede del turno y permite un tiro
+ *    extra (resuelve con 'reroll').
+ */
+function showSpecialChoicePopup(player, kind) {
+  return new Promise(resolve => {
+    const cat = getCategory(kind);
+    const el = cloneTemplate('tpl-special-popup');
+    el.querySelector('[data-role="icon"]').textContent = cat.icon;
+    el.querySelector('[data-role="title"]').textContent = cat.name;
+
+    const optionsWrap = el.querySelector('[data-role="star-options"]');
+    const pending = pendingCategoriesFor(player);
+
+    if (pending.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'special-empty';
+      empty.textContent = '¡Ya tenés todas las estrellas!';
+      optionsWrap.appendChild(empty);
+    } else {
+      pending.forEach(catId => {
+        const c = getCategory(catId);
+        const btn = document.createElement('button');
+        btn.className = 'lap-option';
+        btn.style.setProperty('--opt-color', c.color);
+        btn.innerHTML = `<span class="lap-option-icon">${c.icon}</span><span>${c.name}</span>`;
+        btn.addEventListener('click', async () => {
+          await hideOverlayEl(el);
+          await claimStarViaPopup(player, catId);
+          resolve('claimed');
+        }, { once: true });
+        optionsWrap.appendChild(btn);
+      });
+    }
+
+    el.querySelector('[data-action="reroll"]').addEventListener('click', async () => {
+      await hideOverlayEl(el);
+      resolve('reroll');
+    }, { once: true });
+
     showOverlayEl(el);
   });
 }
@@ -300,6 +364,31 @@ function showFinalScreen() {
 
     showOverlayEl(el);
   });
+}
+
+/* ====================== DADO CENTRAL Y CONTADOR DIGITAL ====================== */
+
+/** Muestra el número grande sobre el dado, en el centro del tablero. */
+function showDigitalCounter(value) {
+  UI.digitalCounterEl.textContent = String(value);
+  UI.digitalCounterEl.classList.add('visible');
+}
+
+/** Actualiza el número mientras la ficha avanza casilla por casilla. */
+function updateDigitalCounter(value) {
+  UI.digitalCounterEl.textContent = String(value);
+}
+
+/** Oculta el contador (por ejemplo, al llegar a 0 o al interrumpir el
+ * movimiento porque el jugador cayó en Salida). */
+function hideDigitalCounter() {
+  UI.digitalCounterEl.classList.remove('visible');
+}
+
+/** Vuelve a dejar el dado listo y visible para el próximo turno. */
+function resetDiceDisplay() {
+  hideDigitalCounter();
+  UI.diceCube.querySelector('.dice-face').textContent = '?';
 }
 
 function setRollButtonEnabled(enabled, label) {
