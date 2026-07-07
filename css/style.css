@@ -508,6 +508,43 @@ button {
   75% { transform: rotate(8deg); }
 }
 
+/* Revelado de respuesta bonus: oculto hasta tocar "Ver respuesta" */
+.bonus-answer-wrap {
+  display: none;
+  margin: 4px 0 22px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: rgba(255,215,0,0.08);
+  border: 1px solid rgba(255,215,0,0.35);
+  text-align: left;
+}
+.bonus-answer-wrap.visible {
+  display: block;
+  animation: answerReveal .38s var(--ease-bounce);
+}
+@keyframes answerReveal {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.bonus-answer-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.bonus-answer-text {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.bonus-result-actions { display: none; }
+.bonus-result-actions.visible { display: flex; }
+
 /* Popup de "salió 5" (tiro extra manual) */
 .five-popup {
   width: min(400px, 100%);

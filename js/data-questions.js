@@ -11,33 +11,33 @@
 
 const MAIN_QUESTIONS = {
   trabajo: [
-    '¿Qué proyecto disfrutaste más este año?',
-    '¿Qué tarea sentís que hoy hacés mucho mejor que hace unos meses?',
+    '¿Qué objetivos laborales te habías propuesto este año? ¿Sentís que pudiste cumplir alguno?',
+    '¿Hay algún tipo de proyecto o área que te gustaría explorar más?',
     '¿Qué te gustaría hacer más seguido dentro del trabajo?'
   ],
   equipo: [
-    '¿Qué compañero te ayudó alguna vez cuando lo necesitabas?',
+    '¿Hay algo que sentís que podrías mejorar para que el trabajo en equipo sea todavía mejor?',
     '¿Qué es algo que valorás del equipo?',
     '¿Qué hace que un día de trabajo sea bueno para vos?'
   ],
   aprendizajes: [
     '¿Qué aprendiste este año que no esperabas aprender?',
     '¿Qué desafío te enseñó más?',
-    '¿Qué habilidad te gustaría desarrollar el próximo semestre?'
+    '¿Qué habilidad te gustaría desarrollar durante los próximos meses?'
   ],
   anecdotas: [
     '¿Cuál fue el momento más divertido del año?',
-    '¿Cuál fue la situación más inesperada que viviste trabajando?',
+    '¿Qué fue lo que más disfrutaste de este año?',
     '¿Qué cliente o comentario recordás con más gracia?'
   ],
   futuro: [
     '¿Qué te gustaría que pase de acá a fin de año?',
     '¿Hay algún proyecto o tipo de tarea que te gustaría hacer?',
-    'Si pudieras cambiar una sola cosa del trabajo, ¿qué cambiarías?'
+    'Si pudieras cambiar una sola cosa del trabajo para lo que queda del año, ¿qué cambiarías?'
   ],
   random: [
     'Si el equipo fuera una película, ¿qué género sería?',
-    '¿Qué canción describiría tu semana laboral?',
+    '¿Y qué fue lo que menos disfrutaste o lo que más te costó?',
     '¿Qué superpoder elegirías para trabajar?'
   ]
 };

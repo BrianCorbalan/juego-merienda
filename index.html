@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>¡Vuelta al Año! · Juego de Equipo</title>
+<title>Medienda y Juegos</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
     <header class="topbar">
       <div class="brand">
         <span class="brand-dice">🎲</span>
-        <span class="brand-text">Vuelta al Año</span>
+        <span class="brand-text">Bo-LUDO</span>
       </div>
       <div class="turn-chip" id="turnChip">
         <span id="turnChipEmoji">🐯</span>
@@ -77,7 +77,17 @@
         <div class="qc-icon">🎁</div>
         <div class="qc-category">BONUS · Cultura General</div>
         <div class="qc-question" data-role="question"></div>
-        <div class="qc-actions two">
+
+        <div class="qc-actions" data-role="reveal-actions">
+          <button class="btn btn-primary" data-action="reveal">👁️ Ver respuesta</button>
+        </div>
+
+        <div class="bonus-answer-wrap" data-role="answer-wrap">
+          <div class="bonus-answer-label">Respuesta</div>
+          <div class="bonus-answer-text" data-role="answer"></div>
+        </div>
+
+        <div class="qc-actions two bonus-result-actions" data-role="result-actions">
           <button class="btn btn-correct" data-action="correct">✅ Correcto</button>
           <button class="btn btn-incorrect" data-action="incorrect">❌ Incorrecto</button>
         </div>

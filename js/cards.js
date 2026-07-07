@@ -30,11 +30,12 @@ async function runMainQuestionFlow(player, categoryId) {
 }
 
 async function runBonusFlow(player) {
-  const questionText = drawBonusQuestion();
-  const correct = await showBonusCard(questionText);
+  const bonusItem = drawBonusQuestion();
+  const correct = await showBonusCard(bonusItem);
   if (correct) {
-    player.coins += coinsForBonus();
+    player.coins += coinsForBonus(player);
   }
+  // Si es incorrecto, no se otorga ninguna moneda.
 }
 
 /**
@@ -51,7 +52,8 @@ async function claimStarViaPopup(player, categoryId) {
 
   player.stars[categoryId] = starsAfter;
   player.nextMainIndex[categoryId] = qIndex + 1;
-  player.coins += coinsForMainQuestion();
+  // Nota: las preguntas principales (de estrella) NO otorgan monedas.
+  // Las monedas solo vienen de las bonus correctas y de completar vueltas.
 
   updateSidePanelStars();
   await showStarBurst();

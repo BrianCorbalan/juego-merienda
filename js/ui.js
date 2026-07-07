@@ -228,11 +228,27 @@ function showMainQuestionCard(categoryId, questionText, starsAfter) {
   });
 }
 
-/** Carta bonus. Resuelve con true/false según el resultado elegido por el moderador. */
-function showBonusCard(questionText) {
+/** Carta bonus. Primero muestra solo la pregunta con un botón "Ver
+ * respuesta"; recién al tocarlo se revela la respuesta y aparecen los
+ * botones Correcto / Incorrecto. Resuelve con true/false según el
+ * resultado elegido por el moderador. */
+function showBonusCard(bonusItem) {
   return new Promise(resolve => {
     const el = cloneTemplate('tpl-bonus-card');
-    el.querySelector('[data-role="question"]').textContent = questionText;
+    el.querySelector('[data-role="question"]').textContent = bonusItem.q;
+
+    const answerWrap = el.querySelector('[data-role="answer-wrap"]');
+    const answerText = el.querySelector('[data-role="answer"]');
+    const revealBtn = el.querySelector('[data-action="reveal"]');
+    const revealActionsWrap = el.querySelector('[data-role="reveal-actions"]');
+    const resultActions = el.querySelector('[data-role="result-actions"]');
+
+    revealBtn.addEventListener('click', () => {
+      answerText.textContent = bonusItem.a;
+      answerWrap.classList.add('visible');
+      revealActionsWrap.remove();
+      resultActions.classList.add('visible');
+    }, { once: true });
 
     el.querySelector('[data-action="correct"]').addEventListener('click', async () => {
       await hideOverlayEl(el);

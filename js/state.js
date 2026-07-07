@@ -105,12 +105,16 @@ function coinsForLap(lapNumber) {
   return lapNumber;
 }
 
-/** Monedas por pregunta principal respondida (ocultas hasta el final). */
-function coinsForMainQuestion() {
-  return 2;
+/** Número de la vuelta que el jugador está transitando ahora mismo
+ * (todavía no completada). Antes de cruzar Salida por primera vez está
+ * en la vuelta 1, después de la primera vuelta está en la 2, etc. */
+function currentLapNumber(player) {
+  return player.lapsCompleted + 1;
 }
 
-/** Monedas por bonus correcta: variable para más sorpresa. */
-function coinsForBonus() {
-  return 1 + Math.floor(Math.random() * 3); // 1 a 3
+/** Monedas por bonus correcta: la misma cantidad que corresponde a la
+ * vuelta en la que está el jugador (vuelta 1 = 1 moneda, vuelta 2 = 2,
+ * etc.). Si responde incorrecto, no otorga ninguna.*/
+function coinsForBonus(player) {
+  return currentLapNumber(player);
 }
