@@ -7,7 +7,7 @@
  */
 
 const PLAYER_ROSTER = [
-  { id: 'brian',  name: 'Brian',  emoji: '🐯', tokenColor: '#FF9F45' },
+  { id: 'brian',  name: 'Brian',  emoji: '🐴', tokenColor: '#000000' },
   { id: 'mauro',  name: 'Mauro',  emoji: '🐼', tokenColor: '#EAEAEA' },
   { id: 'brandi', name: 'Brandi', emoji: '🐶', tokenColor: '#C89B6D' },
   { id: 'lu',     name: 'Lu',     emoji: '🐱', tokenColor: '#FF8AC8' },
