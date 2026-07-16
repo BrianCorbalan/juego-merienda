@@ -371,8 +371,16 @@ function showFinalScreen() {
         <span class="ranking-emoji">${p.emoji}</span>
         <span class="ranking-name">${p.name}</span>
         <span class="ranking-coins">🪙 ${p.coins}</span>
+        ${i === 0 ? '<button class="btn btn-prize" data-action="prize">🎁 Premio</button>' : ''}
       </div>
     `).join('');
+
+    const prizeBtn = rankingWrap.querySelector('[data-action="prize"]');
+    if (prizeBtn) {
+      prizeBtn.addEventListener('click', () => {
+        showPrizePopup();
+      });
+    }
 
     el.querySelector('[data-action="close"]').addEventListener('click', () => {
       resolve();
@@ -380,6 +388,82 @@ function showFinalScreen() {
 
     showOverlayEl(el);
   });
+}
+
+/**
+ * Popup del premio para el ganador: 3 opciones grandes y coloridas.
+ * Al elegir una, se revela el resultado correspondiente (mensaje o
+ * video) y recién ahí se puede cerrar el popup.
+ */
+function showPrizePopup() {
+  const el = cloneTemplate('tpl-prize-popup');
+
+  const optionsWrap = el.querySelector('[data-role="prize-options"]');
+  const revealWrap = el.querySelector('[data-role="prize-reveal"]');
+  const revealMessageEl = el.querySelector('[data-role="prize-reveal-message"]');
+  const revealVideoEl = el.querySelector('[data-role="prize-reveal-video"]');
+
+  const PRIZE_MESSAGES = {
+    music: '🎉 ¡Felicitaciones, ganaste 1 día de música Free!',
+    alfajor: '🍫 Podés retirar el alfajor en la próxima merienda'
+  };
+
+  el.querySelectorAll('.prize-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prizeKey = btn.dataset.prize;
+      optionsWrap.style.display = 'none';
+
+      if (prizeKey === 'box') {
+        revealVideoEl.innerHTML =
+          '<div class="prize-video-frame">' +
+          '<video id="prizeCajaVideo" playsinline controls>' +
+          '<source src="media/caja.mp4" type="video/mp4">' +
+          'Tu navegador no soporta la reproducción de este video.' +
+          '</video>' +
+          '</div>';
+        revealVideoEl.classList.add('visible');
+
+        const videoEl = revealVideoEl.querySelector('video');
+
+        videoEl.addEventListener('error', () => {
+          revealVideoEl.insertAdjacentHTML(
+            'beforeend',
+            '<div class="prize-video-error">No se pudo cargar el video. ' +
+            'Verificá que el archivo esté en <code>media/caja.mp4</code>, junto a este index.html.</div>'
+          );
+        });
+
+        // Se dispara dentro del mismo click del usuario, así que la
+        // mayoría de los navegadores permiten reproducir CON sonido
+        // (sin necesidad de "muted"). Si algún navegador lo bloquea de
+        // todos modos, reintentamos silenciado para que al menos arranque.
+        try {
+          videoEl.muted = false;
+          const playPromise = videoEl.play();
+          if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(() => {
+              videoEl.muted = true;
+              try { videoEl.play(); } catch (e) { /* noop */ }
+            });
+          }
+        } catch (e) {
+          // Algunos entornos pueden lanzar de forma sincrónica; el
+          // usuario siempre puede darle play manual con los controles.
+        }
+      } else {
+        revealMessageEl.textContent = PRIZE_MESSAGES[prizeKey] || '';
+        revealMessageEl.classList.add('visible');
+      }
+
+      revealWrap.classList.add('visible');
+    }, { once: true });
+  });
+
+  el.querySelector('[data-action="prize-close"]').addEventListener('click', async () => {
+    await hideOverlayEl(el);
+  }, { once: true });
+
+  showOverlayEl(el);
 }
 
 /* ====================== DADO CENTRAL Y CONTADOR DIGITAL ====================== */

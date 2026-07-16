@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Medienda y Juegos</title>
+<title>¡Vuelta al Año! · Juego de Equipo</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
     <header class="topbar">
       <div class="brand">
         <span class="brand-dice">🎲</span>
-        <span class="brand-text">Bo-LUDO</span>
+        <span class="brand-text">Vuelta al Año</span>
       </div>
       <div class="turn-chip" id="turnChip">
         <span id="turnChipEmoji">🐯</span>
@@ -149,6 +149,37 @@
         <div class="final-sub">Revelando monedas…</div>
         <div class="ranking-list" data-role="ranking"></div>
         <button class="btn btn-primary" data-action="close">Cerrar</button>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-prize-popup">
+    <div class="overlay-backdrop fade">
+      <div class="prize-popup pop">
+        <div class="prize-title">🎁 ¡Elegí tu premio!</div>
+
+        <div class="prize-options" data-role="prize-options">
+          <button class="prize-option prize-green" data-prize="music">
+            <span class="prize-option-label">Día para pasar música<br>sin restricciones</span>
+          </button>
+          <button class="prize-option prize-red" data-prize="alfajor">
+            <span class="prize-option-label">Un alfajor<br>a elección</span>
+          </button>
+          <button class="prize-option prize-pink" data-prize="box">
+            <span class="prize-qmarks" aria-hidden="true">
+              <span>?</span><span>?</span><span>?</span><span>?</span>
+              <span>?</span><span>?</span><span>?</span><span>?</span>
+              <span>?</span><span>?</span><span>?</span><span>?</span>
+            </span>
+            <span class="prize-option-label">O lo que hay<br>dentro de esta caja</span>
+          </button>
+        </div>
+
+        <div class="prize-reveal" data-role="prize-reveal">
+          <div class="prize-reveal-message" data-role="prize-reveal-message"></div>
+          <div class="prize-reveal-video" data-role="prize-reveal-video"></div>
+          <button class="btn btn-primary prize-close-btn" data-action="prize-close">Cerrar</button>
+        </div>
       </div>
     </div>
   </template>
