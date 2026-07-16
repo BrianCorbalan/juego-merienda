@@ -7,10 +7,10 @@
  */
 
 const PLAYER_ROSTER = [
-  { id: 'brian',  name: 'Brian',  emoji: '🐴', tokenColor: '#000000' },
-  { id: 'mauro',  name: 'Mauro',  emoji: '🐼', tokenColor: '#EAEAEA' },
-  { id: 'brandi', name: 'Brandi', emoji: '🐶', tokenColor: '#C89B6D' },
-  { id: 'lu',     name: 'Lu',     emoji: '🐱', tokenColor: '#FF8AC8' },
-  { id: 'ale',    name: 'Ale',    emoji: '🦁', tokenColor: '#FFD24C' },
-  { id: 'dolo',   name: 'Dolo',   emoji: '🐺', tokenColor: '#9AD0FF' }
+  { id: 'brian',  name: 'Brian',  emoji: '🐲', tokenColor: '#666666' },
+  { id: 'mauro',  name: 'Mauro',  emoji: '🐺', tokenColor: '#ca0808' },
+  { id: 'brandi', name: 'Brandi', emoji: '🐶', tokenColor: '#dd2db7' },
+  { id: 'lu',     name: 'Lu',     emoji: '🐱', tokenColor: '#8adeff' },
+  { id: 'ale',    name: 'Ale',    emoji: '🐻', tokenColor: '#e9e9e8' },
+  { id: 'dolo',   name: 'Dolo',   emoji: '🦊', tokenColor: '#38f332' }
 ];
