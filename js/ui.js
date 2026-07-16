@@ -370,7 +370,7 @@ function showFinalScreen() {
         <span class="ranking-medal">${medals[i] || `#${i + 1}`}</span>
         <span class="ranking-emoji">${p.emoji}</span>
         <span class="ranking-name">${p.name}</span>
-        <span class="ranking-coins">🪙 ${p.coins}</span>
+        <span class="ranking-coins">🎖️ ${p.coins}</span>
         ${i === 0 ? '<button class="btn btn-prize" data-action="prize">🎁 Premio</button>' : ''}
       </div>
     `).join('');
