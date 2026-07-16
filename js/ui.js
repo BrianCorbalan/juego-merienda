@@ -404,7 +404,7 @@ function showPrizePopup() {
   const revealVideoEl = el.querySelector('[data-role="prize-reveal-video"]');
 
   const PRIZE_MESSAGES = {
-    music: '🎉 ¡Felicitaciones, ganaste 1 día de música Free!',
+    music: '🎉 ¡Felicitaciones, ganaste 1 día de música LIBRE!',
     alfajor: '🍫 Podés retirar el alfajor en la próxima merienda'
   };
 
